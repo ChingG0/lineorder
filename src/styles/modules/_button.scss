@@ -1,0 +1,43 @@
+.add-to-cart {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.checkout-button {
+  display: block;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  button {
+    width: 48%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+
+.continue-shopping {
+  background-color: #ddd;
+}
+
+.submit-order {
+  background-color: #4CAF50;
+  color: white;
+}
