@@ -2,7 +2,7 @@ let products = [];
 
 export function loadProducts() {
   console.log("loadProducts 函數被調用...");
-  fetch("../data/products.json")
+  fetch('../../data/products.json')
   .then(response => {
     console.log("收到回應，狀態碼：", response.status);
     if (!response.ok) {
