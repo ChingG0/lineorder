@@ -2,23 +2,23 @@ let products = [];
 
 export function loadProducts() {
   console.log("loadProducts 函數被調用...");
-  fetch("data/products.json")
-    .then(response => {
-      console.log("收到回應，狀態碼：", response.status);
-      if (!response.ok) {
-        throw new Error("無法載入產品資料，狀態碼：" + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("產品資料載入成功：", data);
-      products = data;
-      renderProducts();
-    })
-    .catch(err => {
-      console.error("載入產品資料失敗：", err);
-      alert("無法載入產品資料，請確認網路連線或檔案是否存在：" + err.message);
-    });
+  fetch("../data/products.json")
+  .then(response => {
+    console.log("收到回應，狀態碼：", response.status);
+    if (!response.ok) {
+      throw new Error("無法載入產品資料，狀態碼：" + response.status);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("產品資料載入成功：", data);
+    products = data;
+    renderProducts();
+  })
+  .catch(err => {
+    console.error("載入產品資料失敗：", err);
+    alert("無法載入產品資料，請確認網路連線或檔案是否存在：" + err.message);
+  });
 }
 
 function renderProducts() {
@@ -29,7 +29,7 @@ function renderProducts() {
     card.className = "product-card";
     card.innerHTML = `
       <div class="image-container">
-        <img src="${product.image}" alt="${product.name}" class="loading" onload="this.classList.remove('loading'); this.classList.add('loaded');" onerror="console.error('圖片載入失敗: ${product.image}'); this.src='https://via.placeholder.com/150'; this.onerror=null;">
+        <img src="${product.image}" alt="${product.name}" class="loading" onload="this.classList.remove('loading'); this.classList.add('loaded');" onerror="console.error('圖片載入失敗: ${product.image}'); this.src='../images/product1.jpg'; this.onerror=null;">
       </div>
       <div class="product-name">${product.name}</div>
       <div class="product-spec">${product.quantity} 規格: 6顆 300g</div>
