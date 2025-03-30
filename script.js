@@ -31,7 +31,7 @@ let products = [
 ];
 let cart = [];
 
-`document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
   initializeApp();
 });
 
@@ -50,7 +50,7 @@ function initializeApp() {
       renderProducts();
       showMenuPage();
     });
-}`
+}
 
 // === 產品載入模組 (Product Loader Module) ===
 function renderProducts() {
