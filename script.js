@@ -168,57 +168,52 @@ function showThankYouPage() {
 }
 
 // === 訂單模組 (Order Module) ===
-function submitOrder() {
-  const recipient = document.getElementById("recipient").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const location = document.getElementById("location").value.trim();
-  const notes = document.getElementById("notes").value;
-
-  if (!recipient || !phone || !location) {
-    alert("請填寫所有必填欄位！");
-    return;
-  }
-  if (!/^\d{10}$/.test(phone)) {
-    alert("電話號碼必須是10位數字！");
+async function submitOrder() {
+  if (cart.length === 0) {
+    alert("購物車是空的！");
     return;
   }
 
-  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
-  const orderDetails = cart.map(item => `${item.name} x${item.quantity} NT$${item.price * item.quantity}`).join("\n") + `\n\n總金額: NT$${totalAmount}`;
+  if (!validateForm()) {
+    alert("請正確填寫所有必填欄位！");
+    return;
+  }
 
-  liff.sendMessages([{
-    type: "text",
-    text: `訂單 #${orderNumber}：\n訂單狀態已更新為「已確認」。\n\n${orderDetails}`,
-    quickReply: {
-      items: [
-        {
-          type: "action",
-          action: {
-            type: "message",
-            label: "查詢訂單",
-            text: "查詢訂單"
-          }
-        },
-        {
-          type: "action",
-          action: {
-            type: "message",
-            label: "付款並上傳購物",
-            text: "付款並上傳購物"
-          }
-        }
-      ]
+  showLoading();
+  const submitButton = document.querySelector(".submit-order");
+  submitButton.disabled = true;
+
+  try {
+    // 確認 LIFF 是否在 LINE 客戶端內
+    if (!liff.isInClient()) {
+      throw new Error("請在 LINE 應用程式內使用此功能");
     }
-  }])
-    .then(() => {
-      console.log("訊息發送成功");
-      cart = [];
-      updateCartCount();
-      showThankYouPage();
-    })
-    .catch(err => {
-      console.error("訊息發送失敗：", err);
-      alert("訂單提交失敗，請稍後再試！");
-    });
+
+    const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+    const orderDetails = cart.map(item => `${item.name} x${item.quantity} NT$${item.price * item.quantity}`).join("\n") + `\n\n總金額: NT$${totalAmount}`;
+
+    await liff.sendMessages([{
+      type: "text",
+      text: `訂單 #${orderNumber}：\n訂單狀態已更新為「已確認」。\n\n${orderDetails}`,
+      quickReply: {
+        items: [
+          { type: "action", action: { type: "message", label: "查詢訂單", text: "查詢訂單" } },
+          { type: "action", action: { type: "message", label: "付款並上傳購物", text: "付款並上傳購物" } }
+        ]
+      }
+    }]);
+
+    console.log("訊息發送成功");
+    cart = [];
+    updateCartCount();
+    showThankYouPage();
+
+  } catch (err) {
+    console.error("訊息發送失敗：", err);
+    alert(`訂單提交失敗：${err.message}。請確保在 LINE 內操作並檢查網路連線！`);
+  } finally {
+    hideLoading();
+    submitButton.disabled = false;
+  }
 }
