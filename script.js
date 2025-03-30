@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function initializeApp() {
   // 初始化 LIFF
-  liff.init({ liffId: "你的LIFF_ID" })
+  liff.init({ liffId: "2007147358" })
     .then(() => {
       console.log("LIFF 初始化成功");
       renderProducts();
