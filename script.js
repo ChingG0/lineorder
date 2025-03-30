@@ -31,7 +31,7 @@ let products = [
 ];
 let cart = [];
 
-document.addEventListener("DOMContentLoaded", function() {
+`document.addEventListener("DOMContentLoaded", function() {
   initializeApp();
 });
 
@@ -50,7 +50,7 @@ function initializeApp() {
       renderProducts();
       showMenuPage();
     });
-}
+}`
 
 // === 產品載入模組 (Product Loader Module) ===
 function renderProducts() {
@@ -184,34 +184,39 @@ async function submitOrder() {
   submitButton.disabled = true;
 
   try {
-    // 確認 LIFF 是否在 LINE 客戶端內
-    if (!liff.isInClient()) {
-      throw new Error("請在 LINE 應用程式內使用此功能");
-    }
-
+    const userProfile = await liff.getProfile(); // 仍可使用 LIFF 獲取 userId
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
-    const orderDetails = cart.map(item => `${item.name} x${item.quantity} NT$${item.price * item.quantity}`).join("\n") + `\n\n總金額: NT$${totalAmount}`;
+    const orderData = {
+      userId: userProfile.userId,
+      orderDetails: cart.map(item => `${item.name} x${item.quantity} NT$${item.price * item.quantity}`).join("\n"),
+      totalAmount: totalAmount,
+      orderNumber: orderNumber,
+      recipient: document.getElementById("recipient").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      location: document.getElementById("location").value.trim(),
+      notes: document.getElementById("notes").value
+    };
 
-    await liff.sendMessages([{
-      type: "text",
-      text: `訂單 #${orderNumber}：\n訂單狀態已更新為「已確認」。\n\n${orderDetails}`,
-      quickReply: {
-        items: [
-          { type: "action", action: { type: "message", label: "查詢訂單", text: "查詢訂單" } },
-          { type: "action", action: { type: "message", label: "付款並上傳購物", text: "付款並上傳購物" } }
-        ]
-      }
-    }]);
+    const response = await fetch("https://your-line-webhook-app.herokuapp.com/webhook", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+    });
 
-    console.log("訊息發送成功");
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(`後端錯誤: ${result.error || response.statusText}`);
+    }
+
+    console.log("訂單提交成功:", result);
     cart = [];
     updateCartCount();
     showThankYouPage();
 
   } catch (err) {
-    console.error("訊息發送失敗：", err);
-    alert(`訂單提交失敗：${err.message}。請確保在 LINE 內操作並檢查網路連線！`);
+    console.error("訂單提交失敗:", err);
+    alert(`訂單提交失敗：${err.message}。請稍後再試！`);
   } finally {
     hideLoading();
     submitButton.disabled = false;
