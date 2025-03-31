@@ -198,7 +198,7 @@ async function submitOrder() {
       notes: document.getElementById("notes").value
     };
 
-    const response = await fetch("https://your-line-webhook-app.herokuapp.com/webhook", {
+    const response = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderData)
