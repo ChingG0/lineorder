@@ -188,6 +188,21 @@ function validateForm() {
   return true;
 }
 
+// === 載入狀態模組 (Loading State Module) ===
+function showLoading() {
+  const loadingElement = document.getElementById("loading");
+  if (loadingElement) {
+    loadingElement.style.display = "block";
+  }
+}
+
+function hideLoading() {
+  const loadingElement = document.getElementById("loading");
+  if (loadingElement) {
+    loadingElement.style.display = "none";
+  }
+}
+
 // === 訂單模組 (Order Module) ===
 async function submitOrder() {
   if (cart.length === 0) {
@@ -200,6 +215,7 @@ async function submitOrder() {
     return;
   }
 
+  showLoading();
   const submitButton = document.querySelector(".submit-order");
   submitButton.disabled = true;
 
