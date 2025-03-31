@@ -167,6 +167,27 @@ function showThankYouPage() {
   document.getElementById("thank-you-page").style.display = "block";
 }
 
+// === 表單驗證模組 (Form Validation Module) ===
+function validateForm() {
+  const recipient = document.getElementById("recipient").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const location = document.getElementById("location").value.trim();
+
+  // 檢查必填欄位是否為空
+  if (!recipient || !phone || !location) {
+    return false;
+  }
+
+  // 可選：添加電話格式驗證（例如檢查是否為有效的電話號碼）
+  const phoneRegex = /^[0-9]{10}$/; // 假設電話號碼為 10 位數字
+  if (!phoneRegex.test(phone)) {
+    alert("請輸入有效的電話號碼（10 位數字）！");
+    return false;
+  }
+
+  return true;
+}
+
 // === 訂單模組 (Order Module) ===
 async function submitOrder() {
   if (cart.length === 0) {
@@ -179,12 +200,16 @@ async function submitOrder() {
     return;
   }
 
-  showLoading();
   const submitButton = document.querySelector(".submit-order");
   submitButton.disabled = true;
 
   try {
-    const userProfile = await liff.getProfile(); // 仍可使用 LIFF 獲取 userId
+    // 檢查 LIFF 是否可用
+    if (!liff.isInClient() || !liff.isLoggedIn()) {
+      throw new Error("請在 LINE 應用中打開此頁面並登入！");
+    }
+
+    const userProfile = await liff.getProfile();
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
     const orderData = {
@@ -198,7 +223,7 @@ async function submitOrder() {
       notes: document.getElementById("notes").value
     };
 
-    const response = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/", {
+    const response = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/webhook", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderData)
@@ -206,7 +231,7 @@ async function submitOrder() {
 
     const result = await response.json();
     if (!response.ok) {
-      throw new Error(`後端錯誤: ${result.error || response.statusText}`);
+      throw new Error(result.error || "訂單提交失敗");
     }
 
     console.log("訂單提交成功:", result);
