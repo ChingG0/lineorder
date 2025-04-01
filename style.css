@@ -276,7 +276,7 @@ body {
 }
 
 /* === 響應式設計 (Responsive Design) === */
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
