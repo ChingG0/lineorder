@@ -1,4 +1,3 @@
-// === 初始化模組 (Initialization Module) ===
 let products = [
   { id: 1, name: "蘋果", quantity: "6包", price: 100, image: "images/product1.jpg" },
   { id: 2, name: "調味料", quantity: "300g", price: 50, image: "images/product1.jpg" },
@@ -8,6 +7,7 @@ let products = [
 let cart = [];
 
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("視窗寬度:", window.innerWidth);
   initializeApp();
 });
 
@@ -26,19 +26,17 @@ function initializeApp() {
     });
 }
 
-// === 產品載入模組 (Product Loader Module) ===
 function renderProducts() {
   const productGrid = document.getElementById("product-grid");
-  productGrid.innerHTML = ""; // 清空現有內容
-  productGrid.classList.add("row"); // Bootstrap Grid: 加入 row 類別
+  productGrid.innerHTML = "";
+  productGrid.classList.add("row");
 
   products.forEach(product => {
-    // 使用 DOM 操作建立產品卡片
     const col = document.createElement("div");
-    col.className = "col-6 col-md-3 mb-3"; // 2欄 (手機) / 4欄 (桌面)
+    col.className = "col-6 col-md-3 mb-3";
 
     const card = document.createElement("div");
-    card.className = "product-card card h-100 shadow-sm"; // Bootstrap 卡片樣式
+    card.className = "product-card card h-100 shadow-sm";
 
     const imageContainer = document.createElement("div");
     imageContainer.className = "image-container";
@@ -101,7 +99,6 @@ function renderProducts() {
   });
 }
 
-// === 購物車模組 (Cart Module) ===
 function changeQuantity(productId, change) {
   const quantityInput = document.getElementById(`quantity-${productId}`);
   let quantity = parseInt(quantityInput.value);
@@ -140,7 +137,7 @@ function updateCartCount() {
 
 function renderCart() {
   const cartItems = document.getElementById("cart-items");
-  cartItems.innerHTML = ""; // 清空現有內容
+  cartItems.innerHTML = "";
 
   cart.forEach((item, index) => {
     const itemDiv = document.createElement("div");
@@ -174,22 +171,47 @@ function removeFromCart(index) {
   renderCart();
 }
 
-// === 頁面切換模組 (Page Switch Module) ===
 function showMenuPage() {
   document.getElementById("menu-page").style.display = "block";
   document.getElementById("cart-page").style.display = "none";
   document.getElementById("thank-you-page").style.display = "none";
 }
 
-function showCartPage() {
+async function showCartPage() {
   if (cart.length === 0) {
     alert("購物車是空的！");
     return;
   }
-  document.getElementById("menu-page").style.display = "none";
-  document.getElementById("cart-page").style.display = "block";
-  document.getElementById("thank-you-page").style.display = "none";
-  renderCart();
+
+  try {
+    // 檢查是否在 LINE 客戶端中
+    if (!liff.isInClient()) {
+      throw new Error("請在 LINE 應用中打開此頁面！");
+    }
+
+    // 檢查是否已登入
+    if (!liff.isLoggedIn()) {
+      throw new Error("請先登入 LINE！");
+    }
+
+    // 檢查是否為好友
+    const friendship = await liff.getFriendship();
+    if (!friendship.friendFlag) {
+      // 如果不是好友，顯示加好友提示
+      const addFriendModal = new bootstrap.Modal(document.getElementById("addFriendModal"));
+      addFriendModal.show();
+      return; // 中斷進入購物車
+    }
+
+    // 如果是好友，進入購物車頁面
+    document.getElementById("menu-page").style.display = "none";
+    document.getElementById("cart-page").style.display = "block";
+    document.getElementById("thank-you-page").style.display = "none";
+    renderCart();
+  } catch (err) {
+    console.error("檢查好友狀態失敗:", err);
+    alert(`錯誤：${err.message}。請稍後再試！`);
+  }
 }
 
 function showThankYouPage() {
@@ -198,7 +220,6 @@ function showThankYouPage() {
   document.getElementById("thank-you-page").style.display = "block";
 }
 
-// === 表單驗證模組 (Form Validation Module) ===
 function validateForm() {
   const recipient = document.getElementById("recipient").value.trim();
   const phone = document.getElementById("phone").value.trim();
@@ -217,7 +238,6 @@ function validateForm() {
   return true;
 }
 
-// === 載入狀態模組 (Loading State Module) ===
 function showLoading() {
   const loadingElement = document.getElementById("loading");
   if (loadingElement) loadingElement.style.display = "block";
@@ -228,7 +248,6 @@ function hideLoading() {
   if (loadingElement) loadingElement.style.display = "none";
 }
 
-// === 訂單模組 (Order Module) ===
 async function submitOrder() {
   if (cart.length === 0) {
     alert("購物車是空的！");
@@ -245,10 +264,17 @@ async function submitOrder() {
   submitButton.disabled = true;
 
   try {
-    if (!liff.isInClient() || !liff.isLoggedIn()) {
-      throw new Error("請在 LINE 應用中打開此頁面並登入！");
+    // 檢查是否在 LINE 客戶端中
+    if (!liff.isInClient()) {
+      throw new Error("請在 LINE 應用中打開此頁面！");
     }
 
+    // 檢查是否已登入
+    if (!liff.isLoggedIn()) {
+      throw new Error("請先登入 LINE！");
+    }
+
+    // 提交訂單（此處已無需再次檢查好友狀態，因為進入購物車時已檢查）
     const userProfile = await liff.getProfile();
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -283,4 +309,14 @@ async function submitOrder() {
     hideLoading();
     submitButton.disabled = false;
   }
+}
+
+// 加好友函數
+function addFriend() {
+  // 替換為你的 LINE 官方帳號加好友連結
+  const officialAccountLink = "https://line.me/R/ti/p/@ringofruit";
+  liff.openWindow({
+    url: officialAccountLink,
+    external: true,
+  });
 }
