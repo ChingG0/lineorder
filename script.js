@@ -6,8 +6,23 @@ let products = [
 ];
 let cart = [];
 
+// 從 localStorage 載入購物車資料
+function loadCartFromStorage() {
+  const savedCart = localStorage.getItem("cart");
+  if (savedCart) {
+    cart = JSON.parse(savedCart);
+  }
+  updateCartCount();
+}
+
+// 將購物車資料保存到 localStorage
+function saveCartToStorage() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   console.log("視窗寬度:", window.innerWidth);
+  loadCartFromStorage(); // 載入購物車資料
   initializeApp();
 });
 
@@ -20,7 +35,7 @@ function initializeApp() {
     })
     .catch(err => {
       console.error("LIFF 初始化失敗：", err);
-      alert("無法初始化應用，請稍後再試！");
+      alert(`無法初始化應用：${err.message}。請確認您是否在 LINE 應用中，並檢查官方帳號設置！`);
       renderProducts();
       showMenuPage();
     });
@@ -122,6 +137,7 @@ function addToCart(productId) {
     cart.push(cartItem);
   }
 
+  saveCartToStorage(); // 保存購物車資料
   updateCartCount();
 
   const modalMessage = document.getElementById("cartModalMessage");
@@ -167,6 +183,7 @@ function renderCart() {
 
 function removeFromCart(index) {
   cart.splice(index, 1);
+  saveCartToStorage(); // 保存購物車資料
   updateCartCount();
   renderCart();
 }
@@ -274,7 +291,7 @@ async function submitOrder() {
       throw new Error("請先登入 LINE！");
     }
 
-    // 提交訂單（此處已無需再次檢查好友狀態，因為進入購物車時已檢查）
+    // 提交訂單
     const userProfile = await liff.getProfile();
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -300,6 +317,7 @@ async function submitOrder() {
 
     console.log("訂單提交成功:", result);
     cart = [];
+    saveCartToStorage(); // 清空購物車並保存
     updateCartCount();
     showThankYouPage();
   } catch (err) {
