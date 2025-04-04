@@ -277,7 +277,7 @@ async function submitOrder() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const randomNum = Math.floor(1000 + Math.random() * 9000); // 4位亂碼 (1000-9999)
-    const orderNumber = `AAD-${hours}${minutes}${randomNum}`; // 例如 AAD-17300001
+    const orderNumber = `AAD${hours}${minutes}${randomNum}`; // 例如 AAD-17300001
 
     const orderData = {
       userId: userProfile.userId,
