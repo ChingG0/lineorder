@@ -33,12 +33,11 @@ function renderProducts() {
   productGrid.classList.add("row"); // Bootstrap Grid: 加入 row 類別
 
   products.forEach(product => {
-    // 使用 DOM 操作建立產品卡片
     const col = document.createElement("div");
     col.className = "col-6 col-md-3 mb-3"; // 2欄 (手機) / 4欄 (桌面)
 
     const card = document.createElement("div");
-    card.className = "product-card card h-100 shadow-sm"; // Bootstrap 卡片樣式
+    card.className = "product-card card h-100 shadow-sm";
 
     const imageContainer = document.createElement("div");
     imageContainer.className = "image-container";
@@ -156,7 +155,7 @@ function renderCart() {
 
     const priceSpan = document.createElement("span");
     priceSpan.textContent = `NT$${item.price * item.quantity}`;
-    priceSpan.className = "flex-1 text-end fw-bold";
+    priceSpan.className = "flex-1 text-end fw-bold me-3"; // 添加 me-3 增加右邊距
 
     const removeBtn = document.createElement("button");
     removeBtn.className = "btn btn-danger btn-sm";
@@ -166,6 +165,13 @@ function renderCart() {
     itemDiv.append(nameSpan, quantitySpan, priceSpan, removeBtn);
     cartItems.appendChild(itemDiv);
   });
+
+  // 添加總金額
+  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalDiv = document.createElement("div");
+  totalDiv.className = "cart-total d-flex justify-content-between p-2 fw-bold";
+  totalDiv.innerHTML = `<span>總金額</span><span>NT$${totalAmount}</span>`;
+  cartItems.appendChild(totalDiv);
 }
 
 function removeFromCart(index) {
@@ -251,7 +257,14 @@ async function submitOrder() {
 
     const userProfile = await liff.getProfile();
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
+    // 生成新訂單編號
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const randomNum = Math.floor(1000 + Math.random() * 9000); // 4位亂碼 (1000-9999)
+    const orderNumber = `AAD-${hours}${minutes}${randomNum}`; // 例如 AAD-17300001
+
     const orderData = {
       userId: userProfile.userId,
       orderDetails: cart.map(item => `${item.name} x${item.quantity} NT$${item.price * item.quantity}`).join("\n"),
