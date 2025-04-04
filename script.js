@@ -5,13 +5,20 @@ let products = [
   { id: 3, name: "泡麵", quantity: "6包", price: 100, image: "images/product1.jpg" },
   { id: 4, name: "泡麵", quantity: "6包", price: 100, image: "images/product1.jpg" },
 ];
-let cart = [];
+let cart = []; // 初始為空，但會從 localStorage 載入
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeApp();
 });
 
 function initializeApp() {
+  // 從 localStorage 載入購物車資料
+  const savedCart = localStorage.getItem("cart");
+  if (savedCart) {
+    cart = JSON.parse(savedCart);
+    updateCartCount(); // 初始化時更新購物車數量
+  }
+
   liff.init({ liffId: "2007147358-gA92Lq1a" })
     .then(() => {
       console.log("LIFF 初始化成功");
@@ -125,6 +132,7 @@ function addToCart(productId) {
   }
 
   updateCartCount();
+  saveCartToStorage(); // 每次加入購物車時儲存
 
   const modalMessage = document.getElementById("cartModalMessage");
   modalMessage.textContent = `${product.name} 已加入購物車！`;
@@ -177,7 +185,13 @@ function renderCart() {
 function removeFromCart(index) {
   cart.splice(index, 1);
   updateCartCount();
+  saveCartToStorage(); // 移除時儲存
   renderCart();
+}
+
+// === 持久化儲存購物車 ===
+function saveCartToStorage() {
+  localStorage.setItem("cart", JSON.stringify(cart));
 }
 
 // === 頁面切換模組 (Page Switch Module) ===
@@ -286,7 +300,8 @@ async function submitOrder() {
     if (!response.ok) throw new Error(result.error || "訂單提交失敗");
 
     console.log("訂單提交成功:", result);
-    cart = [];
+    cart = []; // 清空購物車
+    saveCartToStorage(); // 提交訂單後儲存空的購物車
     updateCartCount();
     showThankYouPage();
   } catch (err) {
