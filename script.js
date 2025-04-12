@@ -22,8 +22,8 @@ let products = [
   { id: 20, name: "當季水果切盒", quantity: "1盒", price: 90, image: "images/fruitbox01.jpg" },
   { id: 21, name: "哈密瓜三明治", quantity: "1入", price: 140, image: "images/sw-melon01.jpg" },
   { id: 22, name: "綠葡萄三明治", quantity: "1入", price: 140, image: "images/sw-grape.jpg" }
-  
 ];
+
 let cart = []; // 初始為空，但會從 localStorage 載入
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -35,7 +35,7 @@ function initializeApp() {
   const savedCart = localStorage.getItem("cart");
   if (savedCart) {
     cart = JSON.parse(savedCart);
-    updateCartCount(); // 初始化時更新購物車數量
+    updateCartCount();
   }
 
   liff.init({ liffId: "2007147358-gA92Lq1a" })
@@ -46,21 +46,22 @@ function initializeApp() {
     })
     .catch(err => {
       console.error("LIFF 初始化失敗：", err);
-      alert("無法初始化應用，請稍後再試！");
+      alert("無法初始化應用，請在 LINE 中打開此頁面！");
       renderProducts();
       showMenuPage();
+      document.querySelector(".submit-order").disabled = true;
     });
 }
 
 // === 產品載入模組 (Product Loader Module) ===
 function renderProducts() {
   const productGrid = document.getElementById("product-grid");
-  productGrid.innerHTML = ""; // 清空現有內容
-  productGrid.classList.add("row"); // Bootstrap Grid: 加入 row 類別
+  productGrid.innerHTML = "";
+  productGrid.classList.add("row");
 
   products.forEach(product => {
     const col = document.createElement("div");
-    col.className = "col-6 col-md-3 mb-3"; // 2欄 (手機) / 4欄 (桌面)
+    col.className = "col-6 col-md-3 mb-3";
 
     const card = document.createElement("div");
     card.className = "product-card card h-100 shadow-sm";
@@ -69,11 +70,14 @@ function renderProducts() {
     imageContainer.className = "image-container";
 
     const img = document.createElement("img");
-    img.src = product.image;
+    img.src = `${product.image}?v=${Date.now()}`; // 圖片快取清除
     img.alt = product.name;
     img.className = "loading card-img-top";
     img.onload = () => { img.classList.remove("loading"); img.classList.add("loaded"); };
-    img.onerror = () => { console.error(`圖片載入失敗: ${product.image}`); img.src = "images/product1.jpg"; };
+    img.onerror = () => {
+      console.error(`圖片載入失敗: ${product.image}`);
+      img.src = "https://via.placeholder.com/150?text=Image+Not+Found";
+    };
     imageContainer.appendChild(img);
 
     const cardBody = document.createElement("div");
@@ -103,9 +107,14 @@ function renderProducts() {
     quantityInput.type = "text";
     quantityInput.id = `quantity-${product.id}`;
     quantityInput.value = "1";
-    quantityInput.readOnly = true;
     quantityInput.className = "form-control form-control-sm mx-2 text-center";
     quantityInput.style.width = "50px";
+    quantityInput.addEventListener("input", () => {
+      let value = parseInt(quantityInput.value);
+      if (isNaN(value) || value < 1) {
+        quantityInput.value = 1;
+      }
+    });
 
     const plusBtn = document.createElement("button");
     plusBtn.className = "btn btn-outline-secondary btn-sm";
@@ -151,7 +160,7 @@ function addToCart(productId) {
   }
 
   updateCartCount();
-  saveCartToStorage(); // 每次加入購物車時儲存
+  saveCartToStorage();
 
   const modalMessage = document.getElementById("cartModalMessage");
   modalMessage.textContent = `${product.name} 已加入購物車！`;
@@ -162,11 +171,12 @@ function addToCart(productId) {
 function updateCartCount() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   document.getElementById("cart-count").textContent = totalItems;
+  document.getElementById("checkout-button").disabled = totalItems === 0;
 }
 
 function renderCart() {
   const cartItems = document.getElementById("cart-items");
-  cartItems.innerHTML = ""; // 清空現有內容
+  cartItems.innerHTML = "";
 
   cart.forEach((item, index) => {
     const itemDiv = document.createElement("div");
@@ -182,7 +192,7 @@ function renderCart() {
 
     const priceSpan = document.createElement("span");
     priceSpan.textContent = `NT$${item.price * item.quantity}`;
-    priceSpan.className = "flex-1 text-end fw-bold me-3"; // 添加 me-3 增加右邊距
+    priceSpan.className = "flex-1 text-end fw-bold me-3";
 
     const removeBtn = document.createElement("button");
     removeBtn.className = "btn btn-danger btn-sm";
@@ -193,7 +203,6 @@ function renderCart() {
     cartItems.appendChild(itemDiv);
   });
 
-  // 添加總金額
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalDiv = document.createElement("div");
   totalDiv.className = "cart-total d-flex justify-content-between p-2 fw-bold";
@@ -204,7 +213,7 @@ function renderCart() {
 function removeFromCart(index) {
   cart.splice(index, 1);
   updateCartCount();
-  saveCartToStorage(); // 移除時儲存
+  saveCartToStorage();
   renderCart();
 }
 
@@ -239,21 +248,26 @@ function showThankYouPage() {
 
 // === 表單驗證模組 (Form Validation Module) ===
 function validateForm() {
-  const recipient = document.getElementById("recipient").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const location = document.getElementById("location").value.trim();
+  const recipient = sanitizeInput(document.getElementById("recipient").value.trim());
+  const phone = sanitizeInput(document.getElementById("phone").value.trim());
+  const location = sanitizeInput(document.getElementById("location").value.trim());
 
   if (!recipient || !phone || !location) {
+    alert("請填寫所有必填欄位！");
     return false;
   }
 
-  const phoneRegex = /^[0-9]{10}$/;
+  const phoneRegex = /^\+?[0-9]{9,15}$/;
   if (!phoneRegex.test(phone)) {
-    alert("請輸入有效的電話號碼（10 位數字）！");
+    alert("請輸入有效的電話號碼！");
     return false;
   }
 
   return true;
+}
+
+function sanitizeInput(input) {
+  return input.replace(/[<>]/g, "");
 }
 
 // === 載入狀態模組 (Loading State Module) ===
@@ -291,22 +305,17 @@ async function submitOrder() {
     const userProfile = await liff.getProfile();
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    // 生成新訂單編號
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const randomNum = Math.floor(1000 + Math.random() * 9000); // 4位亂碼 (1000-9999)
-    const orderNumber = `AAD${hours}${minutes}${randomNum}`; // 例如 AAD-17300001
+    const orderNumber = `AAD${Date.now()}${Math.floor(1000 + Math.random() * 9000)}`;
 
     const orderData = {
       userId: userProfile.userId,
       orderDetails: cart.map(item => `${item.name} x${item.quantity} NT$${item.price * item.quantity}`).join("\n"),
       totalAmount,
       orderNumber,
-      recipient: document.getElementById("recipient").value.trim(),
-      phone: document.getElementById("phone").value.trim(),
-      location: document.getElementById("location").value.trim(),
-      notes: document.getElementById("notes").value,
+      recipient: sanitizeInput(document.getElementById("recipient").value.trim()),
+      phone: sanitizeInput(document.getElementById("phone").value.trim()),
+      location: sanitizeInput(document.getElementById("location").value.trim()),
+      notes: sanitizeInput(document.getElementById("notes").value),
     };
 
     const response = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/webhook", {
@@ -319,8 +328,8 @@ async function submitOrder() {
     if (!response.ok) throw new Error(result.error || "訂單提交失敗");
 
     console.log("訂單提交成功:", result);
-    cart = []; // 清空購物車
-    saveCartToStorage(); // 提交訂單後儲存空的購物車
+    cart = [];
+    saveCartToStorage();
     updateCartCount();
     showThankYouPage();
   } catch (err) {
