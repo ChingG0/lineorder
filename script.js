@@ -1,9 +1,28 @@
 // === 初始化模組 (Initialization Module) ===
 let products = [
-  { id: 1, name: "蘋果", quantity: "6包", price: 100, image: "images/product1.jpg" },
-  { id: 2, name: "調味料", quantity: "300g", price: 50, image: "images/product1.jpg" },
-  { id: 3, name: "泡麵", quantity: "6包", price: 100, image: "images/product1.jpg" },
-  { id: 4, name: "泡麵", quantity: "6包", price: 100, image: "images/product1.jpg" },
+  { id: 1, name: "紐西蘭富士蘋果#80", quantity: "8入裝", price: 320, image: "images/nz-apple04.jpg" },
+  { id: 2, name: "紐西蘭耀眼蘋果30", quantity: "4入裝", price: 300, image: "images/nz-apple01.jpg" },
+  { id: 3, name: "太陽黃金奇異果#22", quantity: "4粒", price: 200, image: "images/nz-kiwi01.jpg" },
+  { id: 4, name: "澳洲綠無籽葡萄", quantity: "1包2斤裝", price: 360, image: "images/au-grapes02.jpg" },
+  { id: 5, name: "加州香吉士", quantity: "5入裝", price: 100, image: "images/usa-orange.jpg" },
+  { id: 6, name: "加州小蜜柑", quantity: "15入裝", price: 250, image: "images/usa-mandarin01.jpg" },
+  { id: 7, name: "溪洲溫室巨峰葡萄", quantity: "1斤裝", price: 200, image: "images/taiwan-grapes.jpg" },
+  { id: 8, name: "屏東金鑽鳳梨", quantity: "1顆", price: 140, image: "images/taiwan-pineapple.jpg" },
+  { id: 9, name: "屏東硫黃百香果", quantity: "8入裝", price: 200, image: "images/taiwan-passionfruit01.jpg" },
+  { id: 10, name: "台南香華綠肉哈密瓜", quantity: "1顆", price: 300, image: "images/taiwan-netted-melon.jpg" },
+  { id: 11, name: "台南曾文木瓜", quantity: "1顆", price: 130, image: "images/taiwan-papaya.jpg" },
+  { id: 12, name: "嘉義溫室玉女番茄", quantity: "1盒", price: 300, image: "images/taiwan-tomato.jpg" },
+  { id: 13, name: "屏東黑珍珠蓮霧", quantity: "8顆裝", price: 220, image: "images/taiwan-waxapple.jpg" },
+  { id: 14, name: "南投中寮山蕉", quantity: "5根", price: 100, image: "images/taiwan-banana01.jpg" },
+  { id: 15, name: "台南華寶西瓜", quantity: "1/4顆", price: 280, image: "images/taiwan-watermelon.jpg" },
+  { id: 16, name: "北海道烤布丁", quantity: "1入", price: 80, image: "images/pudding.jpg" },
+  { id: 17, name: "北海道鮮奶酪", quantity: "1入", price: 80, image: "images/pannacotta.jpg" },
+  { id: 18, name: "蜂蜜蛋糕捲", quantity: "1盒5入", price: 250, image: "images/chiffon.jpg" },
+  { id: 19, name: "巴斯克起司蛋糕", quantity: "1入", price: 350, image: "images/basque-cheesecake01.jpg" },
+  { id: 20, name: "當季水果切盒", quantity: "1盒", price: 90, image: "images/fruitbox01.jpg" },
+  { id: 21, name: "哈密瓜三明治", quantity: "1入", price: 140, image: "images/sw-melon01.jpg" },
+  { id: 22, name: "綠葡萄三明治", quantity: "1入", price: 140, image: "images/sw-grape.jpg" }
+  
 ];
 let cart = []; // 初始為空，但會從 localStorage 載入
 
