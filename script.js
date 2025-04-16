@@ -22,25 +22,26 @@ let products = [
   { id: 20, name: "當季水果切盒", quantity: "1盒", price: 90, image: "images/fruitbox01.jpg" },
   { id: 21, name: "哈密瓜三明治", quantity: "1入", price: 140, image: "images/sw-melon01.jpg" },
   { id: 22, name: "綠葡萄三明治", quantity: "1入", price: 140, image: "images/sw-grape.jpg" }
-  
 ];
-let cart = []; // 初始為空，但會從 localStorage 載入
+let cart = [];
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeApp();
 });
 
 function initializeApp() {
-  // 從 localStorage 載入購物車資料
   const savedCart = localStorage.getItem("cart");
   if (savedCart) {
     cart = JSON.parse(savedCart);
-    updateCartCount(); // 初始化時更新購物車數量
+    updateCartCount();
   }
 
   liff.init({ liffId: "2007147358-gA92Lq1a" })
     .then(() => {
       console.log("LIFF 初始化成功");
+      if (liff.isInClient()) {
+        alert("請確保已加入我們的 LINE 官方帳號以接收訂單通知！");
+      }
       renderProducts();
       showMenuPage();
     })
@@ -52,15 +53,23 @@ function initializeApp() {
     });
 }
 
+// 加入 LINE 官方帳號
+function joinLineOfficial() {
+  liff.openWindow({
+    url: "line://ti/p/@your-line-official-account-id", // 替換為你的 LINE 官方帳號 ID
+    external: true,
+  });
+}
+
 // === 產品載入模組 (Product Loader Module) ===
 function renderProducts() {
   const productGrid = document.getElementById("product-grid");
-  productGrid.innerHTML = ""; // 清空現有內容
-  productGrid.classList.add("row"); // Bootstrap Grid: 加入 row 類別
+  productGrid.innerHTML = "";
+  productGrid.classList.add("row");
 
   products.forEach(product => {
     const col = document.createElement("div");
-    col.className = "col-6 col-md-3 mb-3"; // 2欄 (手機) / 4欄 (桌面)
+    col.className = "col-6 col-md-3 mb-3";
 
     const card = document.createElement("div");
     card.className = "product-card card h-100 shadow-sm";
@@ -151,7 +160,7 @@ function addToCart(productId) {
   }
 
   updateCartCount();
-  saveCartToStorage(); // 每次加入購物車時儲存
+  saveCartToStorage();
 
   const modalMessage = document.getElementById("cartModalMessage");
   modalMessage.textContent = `${product.name} 已加入購物車！`;
@@ -166,7 +175,7 @@ function updateCartCount() {
 
 function renderCart() {
   const cartItems = document.getElementById("cart-items");
-  cartItems.innerHTML = ""; // 清空現有內容
+  cartItems.innerHTML = "";
 
   cart.forEach((item, index) => {
     const itemDiv = document.createElement("div");
@@ -182,7 +191,7 @@ function renderCart() {
 
     const priceSpan = document.createElement("span");
     priceSpan.textContent = `NT$${item.price * item.quantity}`;
-    priceSpan.className = "flex-1 text-end fw-bold me-3"; // 添加 me-3 增加右邊距
+    priceSpan.className = "flex-1 text-end fw-bold me-3";
 
     const removeBtn = document.createElement("button");
     removeBtn.className = "btn btn-danger btn-sm";
@@ -193,7 +202,6 @@ function renderCart() {
     cartItems.appendChild(itemDiv);
   });
 
-  // 添加總金額
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalDiv = document.createElement("div");
   totalDiv.className = "cart-total d-flex justify-content-between p-2 fw-bold";
@@ -204,7 +212,7 @@ function renderCart() {
 function removeFromCart(index) {
   cart.splice(index, 1);
   updateCartCount();
-  saveCartToStorage(); // 移除時儲存
+  saveCartToStorage();
   renderCart();
 }
 
@@ -231,10 +239,11 @@ function showCartPage() {
   renderCart();
 }
 
-function showThankYouPage() {
+function showThankYouPage(orderNumber) {
   document.getElementById("menu-page").style.display = "none";
   document.getElementById("cart-page").style.display = "none";
   document.getElementById("thank-you-page").style.display = "block";
+  document.getElementById("order-number").textContent = `訂單編號：${orderNumber}`;
 }
 
 // === 表單驗證模組 (Form Validation Module) ===
@@ -289,14 +298,30 @@ async function submitOrder() {
     }
 
     const userProfile = await liff.getProfile();
+    // 檢查是否為好友
+    const isFriendResponse = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/check-friendship", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: userProfile.userId }),
+    });
+
+    const isFriendResult = await isFriendResponse.json();
+    if (!isFriendResponse.ok || !isFriendResult.isFriend) {
+      liff.openWindow({
+        url: "line://ti/p/@your-line-official-account-id", // 替換為你的 LINE 官方帳號 ID
+        external: true,
+      });
+      throw new Error("請先加入我們的 LINE 官方帳號！");
+    }
+
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     // 生成新訂單編號
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const randomNum = Math.floor(1000 + Math.random() * 9000); // 4位亂碼 (1000-9999)
-    const orderNumber = `AAD${hours}${minutes}${randomNum}`; // 例如 AAD-17300001
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const orderNumber = `AAD${hours}${minutes}${randomNum}`;
 
     const orderData = {
       userId: userProfile.userId,
@@ -319,10 +344,10 @@ async function submitOrder() {
     if (!response.ok) throw new Error(result.error || "訂單提交失敗");
 
     console.log("訂單提交成功:", result);
-    cart = []; // 清空購物車
-    saveCartToStorage(); // 提交訂單後儲存空的購物車
+    cart = [];
+    saveCartToStorage();
     updateCartCount();
-    showThankYouPage();
+    showThankYouPage(orderNumber);
   } catch (err) {
     console.error("訂單提交失敗:", err);
     alert(`訂單提交失敗：${err.message}。請稍後再試！`);
