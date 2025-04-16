@@ -308,7 +308,7 @@ async function submitOrder() {
     const isFriendResult = await isFriendResponse.json();
     if (!isFriendResponse.ok || !isFriendResult.isFriend) {
       liff.openWindow({
-        url: "line://ti/p/@your-line-official-account-id", // 替換為你的 LINE 官方帳號 ID
+        url: "line://ti/p/@ringofruit", // 替換為你的 LINE 官方帳號 ID
         external: true,
       });
       throw new Error("請先加入我們的 LINE 官方帳號！");
