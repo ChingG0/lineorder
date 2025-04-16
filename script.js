@@ -39,9 +39,6 @@ function initializeApp() {
   liff.init({ liffId: "2007147358-gA92Lq1a" })
     .then(() => {
       console.log("LIFF 初始化成功");
-      if (liff.isInClient()) {
-        alert("請確保已加入我們的 LINE 官方帳號以接收訂單通知！");
-      }
       renderProducts();
       showMenuPage();
     })
@@ -81,6 +78,9 @@ function renderProducts() {
     img.src = product.image;
     img.alt = product.name;
     img.className = "loading card-img-top";
+    img.loading = "lazy"; // 新增延遲載入
+    img.width = 300; // 指定圖片尺寸，防止佈局偏移
+    img.height = 300;
     img.onload = () => { img.classList.remove("loading"); img.classList.add("loaded"); };
     img.onerror = () => { console.error(`圖片載入失敗: ${product.image}`); img.src = "images/product1.jpg"; };
     imageContainer.appendChild(img);
@@ -229,10 +229,6 @@ function showMenuPage() {
 }
 
 function showCartPage() {
-  if (cart.length === 0) {
-    alert("購物車是空的！");
-    return;
-  }
   document.getElementById("menu-page").style.display = "none";
   document.getElementById("cart-page").style.display = "block";
   document.getElementById("thank-you-page").style.display = "none";
@@ -278,10 +274,6 @@ function hideLoading() {
 
 // === 訂單模組 (Order Module) ===
 async function submitOrder() {
-  if (cart.length === 0) {
-    alert("購物車是空的！");
-    return;
-  }
 
   if (!validateForm()) {
     alert("請正確填寫所有必填欄位！");
