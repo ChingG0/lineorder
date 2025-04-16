@@ -271,6 +271,33 @@ function hideLoading() {
   document.getElementById("loading").style.display = "none";
 }
 
+// 檢查好友狀態（帶重試邯輯）
+async function checkFriendship(userId, retries = 1) {
+  try {
+    const response = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/check-friendship", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    console.log("好友檢查響應狀態:", response.status, response.statusText);
+    const result = await response.json();
+    console.log("好友檢查結果:", result);
+
+    if (!response.ok) {
+      throw new Error(result.error || "好友檢查失敗");
+    }
+
+    return result.isFriend;
+  } catch (error) {
+    console.error(`好友檢查失敗 (嘗試 ${2 - retries + 1}/${2}):`, error);
+    if (retries > 0) {
+      console.log("重試好友檢查...");
+      return await checkFriendship(userId, retries - 1);
+    }
+    throw error;
+  }
+}
+
 // 提交訂單
 async function submitOrder() {
   if (!validateForm()) {
@@ -294,15 +321,9 @@ async function submitOrder() {
     const userProfile = await liff.getProfile();
     console.log("用戶資料:", userProfile);
 
-    const isFriendResponse = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/check-friendship", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: userProfile.userId }),
-    });
-    const isFriendResult = await isFriendResponse.json();
-    console.log("好友檢查結果:", isFriendResult);
-
-    if (!isFriendResponse.ok || !isFriendResult.isFriend) {
+    const isFriend = await checkFriendship(userProfile.userId);
+    if (!isFriend) {
+      console.warn("用戶未加入官方帳號，userId:", userProfile.userId);
       const lineFriendModal = new bootstrap.Modal(document.getElementById("lineFriendModal"));
       lineFriendModal.show();
       return;
@@ -334,8 +355,8 @@ async function submitOrder() {
       body: JSON.stringify(orderData),
     });
 
-    console.log("後端響應:", response.status, await response.text());
     const result = await response.json();
+    console.log("後端響應:", { status: response.status, body: result });
 
     if (!response.ok) {
       throw new Error(result.error || "訂單提交失敗");
@@ -348,7 +369,13 @@ async function submitOrder() {
     showThankYouPage(orderNumber);
   } catch (err) {
     console.error("訂單提交失敗:", err);
-    alert(`訂單提交失敗：${err.message}。請稍後再試！`);
+    let errorMessage = "訂單提交失敗，請稍後再試或聯繫客服！";
+    if (err.message.includes("好友檢查失敗")) {
+      errorMessage = "無法驗證 LINE 好友狀態，請稍後再試或聯繫客服！";
+    } else if (err.message.includes("訂單提交失敗")) {
+      errorMessage = `訂單提交失敗：${err.message}。請稍後再試或聯繫客服！`;
+    }
+    alert(errorMessage);
   } finally {
     hideLoading();
     submitButton.disabled = false;
