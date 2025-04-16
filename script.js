@@ -1,4 +1,3 @@
-// === 初始化模組 (Initialization Module) ===
 let products = [
   { id: 1, name: "紐西蘭富士蘋果8入", quantity: "原裝80顆", price: 320, image: "images/nz-apple04.jpg" },
   { id: 2, name: "紐西蘭耀眼蘋果4入", quantity: "原裝30顆", price: 300, image: "images/nz-apple01.jpg" },
@@ -38,12 +37,14 @@ function initializeApp() {
 
   liff.init({ liffId: "2007147358-gA92Lq1a" })
     .then(() => {
-      console.log("LIFF 初始化成功");
+      console.log("LIFF 初始化成功，LIFF 版本:", liff.getVersion());
+      console.log("是否在 LINE 客戶端:", liff.isInClient());
+      console.log("是否已登錄:", liff.isLoggedIn());
       renderProducts();
       showMenuPage();
     })
     .catch(err => {
-      console.error("LIFF 初始化失敗：", err);
+      console.error("LIFF 初始化失敗:", err);
       alert("無法初始化應用，請稍後再試！");
       renderProducts();
       showMenuPage();
@@ -53,12 +54,12 @@ function initializeApp() {
 // 加入 LINE 官方帳號
 function joinLineOfficial() {
   liff.openWindow({
-    url: "line://ti/p/@ringofruit", // 替換為你的 LINE 官方帳號 ID
+    url: "line://ti/p/@ringofruit",
     external: true,
   });
 }
 
-// === 產品載入模組 (Product Loader Module) ===
+// 渲染產品
 function renderProducts() {
   const productGrid = document.getElementById("product-grid");
   productGrid.innerHTML = "";
@@ -78,8 +79,8 @@ function renderProducts() {
     img.src = product.image;
     img.alt = product.name;
     img.className = "loading card-img-top";
-    img.loading = "lazy"; // 新增延遲載入
-    img.width = 300; // 指定圖片尺寸，防止佈局偏移
+    img.loading = "lazy";
+    img.width = 300;
     img.height = 300;
     img.onload = () => { img.classList.remove("loading"); img.classList.add("loaded"); };
     img.onerror = () => { console.error(`圖片載入失敗: ${product.image}`); img.src = "images/product1.jpg"; };
@@ -135,7 +136,7 @@ function renderProducts() {
   });
 }
 
-// === 購物車模組 (Cart Module) ===
+// 購物車功能
 function changeQuantity(productId, change) {
   const quantityInput = document.getElementById(`quantity-${productId}`);
   let quantity = parseInt(quantityInput.value);
@@ -216,12 +217,11 @@ function removeFromCart(index) {
   renderCart();
 }
 
-// === 持久化儲存購物車 ===
 function saveCartToStorage() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// === 頁面切換模組 (Page Switch Module) ===
+// 頁面切換
 function showMenuPage() {
   document.getElementById("menu-page").style.display = "block";
   document.getElementById("cart-page").style.display = "none";
@@ -242,13 +242,14 @@ function showThankYouPage(orderNumber) {
   document.getElementById("order-number").textContent = `訂單編號：${orderNumber}`;
 }
 
-// === 表單驗證模組 (Form Validation Module) ===
+// 表單驗證
 function validateForm() {
   const recipient = document.getElementById("recipient").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const location = document.getElementById("location").value.trim();
 
   if (!recipient || !phone || !location) {
+    alert("請填寫所有必填欄位！");
     return false;
   }
 
@@ -261,22 +262,23 @@ function validateForm() {
   return true;
 }
 
-// === 載入狀態模組 (Loading State Module) ===
+// 載入狀態
 function showLoading() {
-  const loadingElement = document.getElementById("loading");
-  if (loadingElement) loadingElement.style.display = "block";
+  document.getElementById("loading").style.display = "block";
 }
 
 function hideLoading() {
-  const loadingElement = document.getElementById("loading");
-  if (loadingElement) loadingElement.style.display = "none";
+  document.getElementById("loading").style.display = "none";
 }
 
-// === 訂單模組 (Order Module) ===
+// 提交訂單
 async function submitOrder() {
-
   if (!validateForm()) {
-    alert("請正確填寫所有必填欄位！");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("購物車是空的，請先添加產品！");
     return;
   }
 
@@ -290,25 +292,23 @@ async function submitOrder() {
     }
 
     const userProfile = await liff.getProfile();
-    // 檢查是否為好友
+    console.log("用戶資料:", userProfile);
+
     const isFriendResponse = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/check-friendship", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: userProfile.userId }),
     });
-
     const isFriendResult = await isFriendResponse.json();
+    console.log("好友檢查結果:", isFriendResult);
+
     if (!isFriendResponse.ok || !isFriendResult.isFriend) {
-      liff.openWindow({
-        url: "line://ti/p/@ringofruit", // 替換為你的 LINE 官方帳號 ID
-        external: true,
-      });
-      throw new Error("請先加入我們的 LINE 官方帳號！");
+      const lineFriendModal = new bootstrap.Modal(document.getElementById("lineFriendModal"));
+      lineFriendModal.show();
+      return;
     }
 
     const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-    // 生成新訂單編號
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
@@ -323,8 +323,10 @@ async function submitOrder() {
       recipient: document.getElementById("recipient").value.trim(),
       phone: document.getElementById("phone").value.trim(),
       location: document.getElementById("location").value.trim(),
-      notes: document.getElementById("notes").value,
+      notes: document.getElementById("notes").value.trim(),
     };
+
+    console.log("提交訂單數據:", orderData);
 
     const response = await fetch("https://your-line-webhook-app-4d2cb4d3dfa4.herokuapp.com/webhook", {
       method: "POST",
@@ -332,8 +334,12 @@ async function submitOrder() {
       body: JSON.stringify(orderData),
     });
 
+    console.log("後端響應:", response.status, await response.text());
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "訂單提交失敗");
+
+    if (!response.ok) {
+      throw new Error(result.error || "訂單提交失敗");
+    }
 
     console.log("訂單提交成功:", result);
     cart = [];

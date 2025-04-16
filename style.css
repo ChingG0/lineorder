@@ -50,7 +50,7 @@ body {
   padding: 10px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* 置中 */
+  justify-content: center;
 }
 
 .product-card {
@@ -132,8 +132,8 @@ body {
 }
 
 .checkout-button {
-  width: calc(100% - 20px); /* 與兩個商品的總寬度相同，考慮 padding */
-  max-width: 400px; /* 限制最大寬度，避免過寬 */
+  width: calc(100% - 20px);
+  max-width: 400px;
 }
 
 /* 購物車項目樣式 */
@@ -171,6 +171,11 @@ body {
 /* 響應式設計 */
 @media (max-width: 576px) {
   .checkout-button {
-    width: calc(100% - 20px); /* 手機上保持與兩欄寬度一致 */
+    width: calc(100% - 20px);
   }
+}
+
+/* 載入中樣式 */
+#loading {
+  z-index: 2000;
 }
