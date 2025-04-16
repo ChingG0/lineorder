@@ -56,7 +56,7 @@ function initializeApp() {
 // 加入 LINE 官方帳號
 function joinLineOfficial() {
   liff.openWindow({
-    url: "line://ti/p/@your-line-official-account-id", // 替換為你的 LINE 官方帳號 ID
+    url: "line://ti/p/@ringofruit", // 替換為你的 LINE 官方帳號 ID
     external: true,
   });
 }
