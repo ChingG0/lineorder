@@ -21,9 +21,9 @@ let products = [
   { id: 18, name: "台南華寶西瓜1/4顆", quantity: "1/4顆", price: 280, image: "images/taiwan-watermelon01.jpg" },
 
   { id: 19, name: "南投信義青梅10斤", quantity: "10斤", price: 1200, image: "images/taiwan-plum01.jpg" },
-  { id: 20, name: "南投牧草雞蛋1盒", quantity: "一箱3斤", price: 305, image: "images/egg.jpg" },
-  { id: 21, name: "雲林蒜頭(大)2斤", quantity: "一袋2斤", price: 400, image: "images/taiwan-garlic02.jpg" },
-  { id: 22, name: "雲林蒜頭(中)2斤", quantity: "一袋2斤", price: 300, image: "images/taiwan-garlic01.jpg" },
+  { id: 20, name: "南投牧草雞蛋1盒", quantity: "一箱3斤", price: 305, image: "images/egg01.jpg" },
+  { id: 21, name: "雲林蒜頭(大)2斤", quantity: "一袋2斤", price: 400, image: "images/taiwan-garlic2.jpg" },
+  { id: 22, name: "雲林蒜頭(中)2斤", quantity: "一袋2斤", price: 300, image: "images/taiwan-garlic1.jpg" },
 ];
 let cart = [];
 
