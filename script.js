@@ -38,19 +38,46 @@ function initializeApp() {
     updateCartCount();
   }
 
+  // 顯示載入中 UI
+  showLoading();
+
   liff.init({ liffId: "2007147358-gA92Lq1a" })
     .then(() => {
       console.log("LIFF 初始化成功，LIFF 版本:", liff.getVersion());
       console.log("是否在 LINE 客戶端:", liff.isInClient());
       console.log("是否已登錄:", liff.isLoggedIn());
-      renderProducts();
-      showMenuPage();
+
+      // 預載圖片後再渲染
+      preloadImages()
+        .then(() => {
+          renderProducts();
+          showMenuPage();
+          hideLoading();
+        })
+        .catch(err => {
+          console.error("圖片預載失敗:", err);
+          renderProducts(); // 即使失敗也渲染，使用備用圖片
+          showMenuPage();
+          hideLoading();
+        });
     })
     .catch(err => {
       console.error("LIFF 初始化失敗:", err);
       alert("無法初始化應用，請稍後再試！");
-      renderProducts();
-      showMenuPage();
+
+      // 即使 LIFF 初始化失敗，也嘗試預載圖片並渲染
+      preloadImages()
+        .then(() => {
+          renderProducts();
+          showMenuPage();
+          hideLoading();
+        })
+        .catch(err => {
+          console.error("圖片預載失敗:", err);
+          renderProducts();
+          showMenuPage();
+          hideLoading();
+        });
     });
 }
 
@@ -59,6 +86,34 @@ function joinLineOfficial() {
   liff.openWindow({
     url: "line://ti/p/@ringofruit",
     external: true,
+  });
+}
+
+// 渲染圖片
+function preloadImages() {
+  let successCount = 0;
+  let failureCount = 0;
+
+  const imagePromises = products.map(product => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = product.image;
+      img.onload = () => {
+        successCount++;
+        console.log(`圖片載入成功: ${product.image}`);
+        resolve();
+      };
+      img.onerror = () => {
+        failureCount++;
+        console.error(`圖片載入失敗: ${product.image}`);
+        product.image = "images/fallback.jpg";
+        resolve();
+      };
+    });
+  });
+
+  return Promise.all(imagePromises).then(() => {
+    console.log(`圖片預載完成: 成功 ${successCount} 張，失敗 ${failureCount} 張`);
   });
 }
 
