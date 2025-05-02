@@ -14,7 +14,7 @@ let products = [
   { id: 11, name: "溪洲溫室巨峰葡萄1串", quantity: "1組600g", price: 200, image: "images/taiwan-grapes.jpg" },
   { id: 12, name: "嘉義溫室玉女番茄1盒", quantity: "1盒", price: 280, image: "images/taiwan-tomato.jpg" },
   { id: 13, name: "南投中寮山蕉5根", quantity: "一組5根", price: 90, image: "images/taiwan-banana01.jpg" },
-  { id: 14, name: "屏東硫黃百香果10顆", quantity: "1組10顆", price: 200, image: "images/taiwan-passionfruit.jpg" },
+  { id: 14, name: "屏東硫黃百香果10顆", quantity: "1組10顆", price: 200, image: "images/taiwan-passionfruit01.jpg" },
   { id: 15, name: "屏東金鑽鳳梨1顆", quantity: "1顆", price: 130, image: "images/taiwan-pineapple.jpg" },
   { id: 16, name: "台南曾文木瓜1顆", quantity: "1顆", price: 110, image: "images/taiwan-papaya01.jpg" },
   { id: 17, name: "台南香華綠肉哈密瓜1顆", quantity: "1顆", price: 300, image: "images/taiwan-netted-melon.jpg" },
@@ -39,7 +39,7 @@ function initializeApp() {
   }
 
   // 顯示載入中 UI
-  showLoading();
+  showLoading()
 
   liff.init({ liffId: "2007147358-gA92Lq1a" })
     .then(() => {
@@ -48,17 +48,18 @@ function initializeApp() {
       console.log("是否已登錄:", liff.isLoggedIn());
 
       // 預載圖片後再渲染
+      renderProducts()
       preloadImages()
         .then(() => {
-          renderProducts();
-          showMenuPage();
           hideLoading();
+          showMenuPage();
+          
         })
         .catch(err => {
           console.error("圖片預載失敗:", err);
-          renderProducts(); // 即使失敗也渲染，使用備用圖片
-          showMenuPage();
           hideLoading();
+          showMenuPage();
+          
         });
     })
     .catch(err => {
@@ -66,17 +67,17 @@ function initializeApp() {
       alert("無法初始化應用，請稍後再試！");
 
       // 即使 LIFF 初始化失敗，也嘗試預載圖片並渲染
+      renderProducts()
       preloadImages()
         .then(() => {
-          renderProducts();
-          showMenuPage();
           hideLoading();
+          showMenuPage();
         })
         .catch(err => {
           console.error("圖片預載失敗:", err);
-          renderProducts();
-          showMenuPage();
           hideLoading();
+          showMenuPage();
+          
         });
     });
 }
@@ -141,7 +142,7 @@ function renderProducts() {
     img.width = 300;
     img.height = 300;
     img.onload = () => { img.classList.remove("loading"); img.classList.add("loaded"); };
-    img.onerror = () => { console.error(`圖片載入失敗: ${product.image}`); img.src = "images/product1.jpg"; };
+    img.onerror = () => { console.error(`圖片載入失敗: ${product.image}`); img.src = "images/taiwan-peach01.jpg"; };
     imageContainer.appendChild(img);
 
     const cardBody = document.createElement("div");
