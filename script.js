@@ -1,7 +1,7 @@
 let products = [
   { id: 1, name: "大雪山紅鈴水蜜桃8顆", quantity: "4A", price: 650, image: "images/taiwan-peach01.jpg" },
   { id: 2, name: "加州高山櫻桃1斤", quantity: "一盒一斤", price: 550, image: "images/usa-cherry01.jpg" },
-  { id: 3, name: "加州櫻桃禮盒2公斤", quantity: "一盒2公斤", price: 1500, image: "images/usa-cherry02.jpg" },
+  { id: 3, name: "加州櫻桃禮盒2公斤", quantity: "一盒2公斤", price: 1500, image: "images/usa-cherry2.jpg" },
   { id: 4, name: "紐西蘭富士蘋果4入", quantity: "一組4顆", price: 360, image: "images/nz-fujiapple02.jpg" },
   { id: 5, name: "紐西蘭富士蘋果24入", quantity: "原裝24顆", price: 1800, image: "images/nz-fujiapple05.jpg" },
   { id: 6, name: "加州高山櫻桃5kg", quantity: "一箱5kg", price: 3980, image: "images/usa-cherry03.jpg" },
