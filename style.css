@@ -82,7 +82,7 @@ body {
 .product-card img.loaded { opacity: 1; }
 
 .product-name {
-  font-size: 14px;
+  font-size: 18px;
   margin: 5px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -91,7 +91,7 @@ body {
 }
 
 .product-spec {
-  font-size: 12px;
+  font-size: 16px;
   color: #555;
   margin: 5px 0;
 }
