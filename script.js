@@ -1,11 +1,14 @@
 let products = [
-  { id: 1, name: "加州水蜜桃4顆", quantity: "4入", price: 520, image: "images/usa-peach01.JPG" },
-  { id: 2, name: "加州水蜜桃原裝22顆", quantity: "原裝22顆", price: 2380, image: "images/usa-peach02.jpg" },
+  { id: 1, name: "加州水蜜桃4顆#20", quantity: "4入", price: 560, image: "images/usa-peach01.JPG" },
+  { id: 2, name: "加州水蜜桃4顆#22", quantity: "4入", price: 520, image: "images/usa-peach01.JPG" },
+
   { id: 3, name: "加州高山櫻桃1斤", quantity: "一盒一斤", price: 550, image: "images/usa-cherry01.jpg" },
-  { id: 4, name: "加州櫻桃禮盒2公斤", quantity: "一盒2公斤", price: 1500, image: "images/usa-cherry2.jpg" },
-  { id: 5, name: "加州高山櫻桃5kg", quantity: "一箱5kg", price: 3980, image: "images/usa-cherry03.jpg" },
+  { id: 4, name: "加州櫻桃禮盒2公斤", quantity: "一盒2公斤", price: 1650, image: "images/usa-cherry2.jpg" },
+
+  { id: 5, name: "恆春玉荷包荔枝1.5斤", quantity: "1.5斤裝", price:400, image: "images/taiwan-lychee01.jpg" },
   { id: 6, name: "枋山愛文芒果6入", quantity: "6入禮盒", price: 1200, image: "images/taiwan-mango01.JPG" },
   { id: 7, name: "枋山愛文芒果9入", quantity: "9入禮盒", price: 1050, image: "images/taiwan-mango02.JPG" },
+  { id: 5, name: "台南有機紅火龍果3入裝", quantity: "3入裝", price:280, image: "images/taiwan-dragonfruit01.jpg" },
 
   { id: 8, name: "紐西蘭富士蘋果4入", quantity: "一組4顆", price: 360, image: "images/nz-fujiapple02.jpg" },
   { id: 9, name: "紐西蘭富士蘋果24入", quantity: "原裝24顆", price: 1800, image: "images/nz-fujiapple05.jpg" },
@@ -23,7 +26,6 @@ let products = [
   { id: 20, name: "屏東硫黃百香果10顆", quantity: "1組10顆", price: 200, image: "images/taiwan-passionfruit01.jpg" },
   { id: 21, name: "屏東金鑽鳳梨1顆", quantity: "1顆", price: 130, image: "images/taiwan-pineapple.jpg" },
   { id: 22, name: "台南曾文木瓜1顆", quantity: "1顆", price: 110, image: "images/taiwan-papaya01.jpg" },
-  //{ id: 23, name: "台南香華綠肉哈密瓜1顆", quantity: "1顆", price: 300, image: "images/taiwan-netted-melon.jpg" },
   { id: 23, name: "花蓮大西瓜1/4顆", quantity: "1/4顆", price: 280, image: "images/taiwan-watermelon01.jpg" },
   { id: 24, name: "南投牧草雞蛋1盒", quantity: "一箱3斤", price: 320, image: "images/egg01.jpg" },
   { id: 25, name: "雲林蒜頭(大)2斤", quantity: "一袋2斤", price: 400, image: "images/taiwan-garlic2.jpg" },
