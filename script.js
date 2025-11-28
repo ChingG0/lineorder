@@ -9,6 +9,9 @@ let products = [
   { id: 8, name: "青森富士蘋果半箱#23", quantity: "半箱23顆", price: 1450, image: "images/sunfuji4602.JPG" },
   { id: 9, name: "青森富士蘋果原箱#46", quantity: "原箱46顆", price: 2700, image: "images/sunfuji46.JPG" },
   { id: 10, name: "橘肉哈蜜瓜禮盒2入裝", quantity: "2入裝", price: 580, image: "images/melon01.JPG" },
+  { id: 11, name: "麝香葡萄戚風三明治2入", quantity: "2入裝", price: 300, image: "images/sdgrape.JPG" },
+  { id: 12, name: "蜜柑戚風三明治2入", quantity: "2入裝", price: 300, image: "images/sdmikan.JPG" },
+
 ]
 let cart = [];
 
