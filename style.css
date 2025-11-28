@@ -84,10 +84,13 @@ body {
 .product-name {
   font-size: 14px;
   margin: 5px 0;
-  white-space: nowrap;
+  /*white-space: nowrap;*/
   overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;   /* 想要 3 行就改成 3 */
+  /*text-overflow: ellipsis;*/
+  /*max-width: 100%;*/
 }
 
 .product-spec {
