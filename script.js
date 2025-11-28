@@ -1,6 +1,6 @@
 let products = [
   { id: 1, name: "日本富山柿餅", quantity: "單盒", price: 850, image: "images/kaki.JPG" },
-  { id: 2, name: "日本愛媛蜜柑原箱", quantity: "原箱4公斤", price: 2200, image: "images/mikan01.JPG" },
+  { id: 2, name: "日本愛媛蜜柑原箱", quantity: "原箱4公斤", price: 2250, image: "images/mikan01.JPG" },
   { id: 3, name: "日本愛媛蜜柑9入裝", quantity: "9入裝", price: 380, image: "images/mikan02.JPG" },
   { id: 4, name: "青森富士蘋果6入禮盒#28", quantity: "6入禮盒#28", price: 1080, image: "images/fuji2801.JPG" },
   { id: 5, name: "青森富士蘋果半箱#28", quantity: "半箱14顆", price: 2200, image: "images/fuji2802.JPG" },
